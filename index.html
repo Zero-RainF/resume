@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>曾泽霖 | 数据 × 自动化</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+      color: #1a1a2e;
+      background: #fff;
+      overflow-x: hidden;
+    }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #f5f5f5; }
+    ::-webkit-scrollbar-thumb { background: #1a237e; border-radius: 3px; }
+
+    /* ===== Navigation ===== */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      padding: 0 48px; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: all 0.4s;
+    }
+    nav.scrolled {
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 1px 30px rgba(0,0,0,0.06);
+    }
+    .nav-logo {
+      font-size: 20px; font-weight: 700;
+      color: #fff; letter-spacing: 1px;
+      transition: color 0.3s;
+    }
+    nav.scrolled .nav-logo { color: #1a237e; }
+    .nav-logo span { color: #5c6bc0; }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a {
+      font-size: 13px; color: rgba(255,255,255,0.8);
+      text-decoration: none; position: relative;
+      padding-bottom: 4px; font-weight: 500;
+      letter-spacing: 0.5px;
+      transition: color 0.3s;
+    }
+    nav.scrolled .nav-links a { color: #555; }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: 0; left: 0;
+      width: 0; height: 2px; background: #5c6bc0;
+      transition: width 0.3s;
+    }
+    .nav-links a:hover { color: #fff; }
+    nav.scrolled .nav-links a:hover { color: #1a237e; }
+    .nav-links a:hover::after { width: 100%; }
+
+    /* ===== Hero ===== */
+    .hero {
+      min-height: 100vh;
+      position: relative;
+      display: flex; align-items: center;
+      background: linear-gradient(135deg, #0a0a23 0%, #1a237e 50%, #0d0d30 100%);
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(92,107,192,0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(26,35,126,0.2) 0%, transparent 40%),
+        radial-gradient(ellipse at 50% 80%, rgba(92,107,192,0.1) 0%, transparent 40%);
+    }
+    .hero-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .hero-content {
+      position: relative; z-index: 2;
+      padding: 0 48px; max-width: 1200px; margin: 0 auto;
+      width: 100%;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 60px; align-items: center;
+    }
+    .hero-left { padding-top: 40px; }
+    .hero-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      background: rgba(92,107,192,0.15);
+      border: 1px solid rgba(92,107,192,0.3);
+      border-radius: 20px;
+      font-size: 12px; color: #a5b4fc;
+      letter-spacing: 1px; margin-bottom: 20px;
+    }
+    .hero-left h1 {
+      font-size: 56px; font-weight: 700; color: #fff;
+      line-height: 1.15; margin-bottom: 8px;
+      letter-spacing: -1px;
+    }
+    .hero-left h1 .highlight {
+      background: linear-gradient(135deg, #818cf8, #6366f1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-left .sub {
+      font-size: 20px; color: rgba(255,255,255,0.6);
+      font-weight: 400; margin-bottom: 24px;
+      letter-spacing: 2px;
+    }
+    .hero-left .desc {
+      font-size: 15px; color: rgba(255,255,255,0.5);
+      line-height: 1.8; max-width: 480px;
+      margin-bottom: 32px;
+    }
+    .hero-actions {
+      display: flex; gap: 12px; flex-wrap: wrap;
+    }
+    .hero-actions a {
+      padding: 12px 28px; border-radius: 8px;
+      font-size: 14px; font-weight: 500; text-decoration: none;
+      transition: all 0.3s;
+    }
+    .btn-primary {
+      background: #6366f1; color: #fff;
+    }
+    .btn-primary:hover { background: #4f46e5; transform: translateY(-2px); }
+    .btn-outline {
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.8);
+    }
+    .btn-outline:hover {
+      border-color: #6366f1; color: #fff;
+      background: rgba(99,102,241,0.1);
+      transform: translateY(-2px);
+    }
+
+    .hero-right {
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .hero-stat {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 20px 24px;
+      transition: all 0.3s;
+      cursor: default;
+    }
+    .hero-stat:hover {
+      background: rgba(255,255,255,0.08);
+      transform: translateX(-4px);
+    }
+    .hero-stat .num {
+      font-size: 24px; font-weight: 700;
+      background: linear-gradient(135deg, #818cf8, #6366f1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-stat .lbl {
+      font-size: 13px; color: rgba(255,255,255,0.5);
+      margin-top: 2px;
+    }
+    .scroll-hint {
+      position: absolute; bottom: 32px; left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.3);
+      font-size: 12px; letter-spacing: 3px;
+      animation: scrollPulse 2.5s ease-in-out infinite;
+    }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; transform: translateX(-50%) translateY(0); }
+      50% { opacity: 0.8; transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* ===== Stats Bar ===== */
+    .stats-bar {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      max-width: 1000px; margin: -48px auto 0;
+      padding: 0 40px; position: relative; z-index: 10;
+    }
+    .stat-card {
+      background: #fff; padding: 28px 20px; text-align: center;
+      box-shadow: 0 4px 30px rgba(0,0,0,0.06);
+      border-radius: 16px; margin: 0 6px;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .stat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 40px rgba(26,35,126,0.1); }
+    .stat-card .num { font-size: 32px; font-weight: 700; color: #1a237e; }
+    .stat-card .lbl { font-size: 13px; color: #888; margin-top: 4px; }
+
+    /* ===== Section ===== */
+    .section { padding: 100px 40px; }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+    .section-tag {
+      display: inline-block;
+      font-size: 11px; color: #6366f1; font-weight: 600;
+      letter-spacing: 3px; text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .section-head {
+      font-size: 34px; font-weight: 700; color: #1a1a2e;
+      margin-bottom: 8px; letter-spacing: -0.5px;
+    }
+    .section-sub {
+      font-size: 15px; color: #888;
+      max-width: 600px; line-height: 1.7;
+      margin-bottom: 48px;
+    }
+
+    /* ===== About ===== */
+    #about { position: relative; }
+    #about::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(180deg, #f8f9ff 0%, #fff 100%);
+      z-index: -1;
+    }
+    .about-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .about-card {
+      padding: 24px 28px; border-radius: 14px;
+      background: #fff; border: 1px solid #f0f0f5;
+      display: flex; align-items: center; gap: 16px;
+      transition: all 0.3s;
+    }
+    .about-card:hover { border-color: #6366f1; box-shadow: 0 4px 20px rgba(99,102,241,0.08); }
+    .about-card .icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: #eef0ff; display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .about-card .lbl { font-size: 12px; color: #999; margin-bottom: 2px; }
+    .about-card .val { font-size: 15px; color: #1a1a2e; font-weight: 500; }
+
+    /* ===== Skills ===== */
+    #skills {
+      background: #0a0a23;
+      position: relative; overflow: hidden;
+    }
+    #skills::before {
+      content: ''; position: absolute;
+      top: -200px; right: -200px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 60%);
+      border-radius: 50%;
+    }
+    #skills .section-head { color: #fff; }
+    #skills .section-sub { color: rgba(255,255,255,0.4); }
+    .skills-showcase {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 24px; position: relative; z-index: 2;
+    }
+    .skill-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px; padding: 32px 28px;
+      transition: all 0.4s;
+      position: relative; overflow: hidden;
+    }
+    .skill-card::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, transparent, #6366f1, transparent);
+      transform: scaleX(0); transition: transform 0.4s;
+    }
+    .skill-card:hover::before { transform: scaleX(1); }
+    .skill-card:hover { transform: translateY(-8px); border-color: rgba(99,102,241,0.3); }
+    .skill-card .icon {
+      width: 52px; height: 52px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; margin-bottom: 18px;
+    }
+    .skill-card h3 { font-size: 18px; color: #fff; margin-bottom: 8px; }
+    .skill-card p { font-size: 13px; color: rgba(255,255,255,0.4); line-height: 1.8; }
+    .skill-card .cert {
+      display: inline-block; margin-top: 14px;
+      padding: 4px 12px;
+      background: rgba(99,102,241,0.12);
+      border: 1px solid rgba(99,102,241,0.2);
+      border-radius: 8px;
+      font-size: 11px; color: #818cf8; font-weight: 500;
+    }
+
+    /* ===== Experience ===== */
+    .exp-grid { display: grid; gap: 24px; }
+    .exp-card {
+      display: grid; grid-template-columns: 180px 1fr;
+      gap: 0; border-radius: 16px;
+      background: #fff; border: 1px solid #f0f0f5;
+      overflow: hidden; transition: all 0.3s;
+    }
+    .exp-card:hover { border-color: #6366f1; box-shadow: 0 4px 24px rgba(99,102,241,0.06); }
+    .exp-side {
+      background: linear-gradient(135deg, #1a237e, #283593);
+      padding: 28px 24px; color: #fff;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .exp-side .company { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+    .exp-side .period { font-size: 12px; opacity: 0.6; }
+    .exp-side .role {
+      font-size: 13px; opacity: 0.8; margin-top: 8px;
+      padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .exp-body { padding: 24px 28px; }
+    .exp-body .highlight {
+      display: inline-block;
+      padding: 3px 10px; border-radius: 6px;
+      font-size: 11px; font-weight: 500;
+      margin-bottom: 12px;
+    }
+    .exp-body .highlight.blue { background: #eef0ff; color: #6366f1; }
+    .exp-body ul { list-style: none; }
+    .exp-body li {
+      font-size: 13.5px; color: #555; line-height: 1.7;
+      padding-left: 18px; position: relative; margin-bottom: 5px;
+    }
+    .exp-body li::before {
+      content: '→'; position: absolute; left: 0; color: #6366f1;
+      font-weight: 600;
+    }
+
+    /* ===== Projects ===== */
+    #projects {
+      background: linear-gradient(180deg, #f8f9ff 0%, #fff 100%);
+    }
+    .proj-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .proj-card {
+      border-radius: 16px; overflow: hidden;
+      background: #fff; border: 1px solid #f0f0f5;
+      transition: all 0.4s;
+    }
+    .proj-card:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(26,35,126,0.08); border-color: transparent; }
+    .proj-card .top {
+      padding: 22px 24px 14px;
+      border-left: 4px solid #6366f1;
+    }
+    .proj-card .top h3 { font-size: 17px; color: #1a1a2e; font-weight: 600; margin-bottom: 6px; }
+    .proj-card .top .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .proj-card .top .tags span {
+      font-size: 11px; padding: 2px 10px;
+      background: #eef0ff; color: #6366f1;
+      border-radius: 6px; font-weight: 500;
+    }
+    .proj-card .body { padding: 6px 24px 20px; }
+    .proj-card .body li {
+      font-size: 13px; color: #555; line-height: 1.7;
+      padding-left: 14px; position: relative;
+      list-style: none; margin-bottom: 3px;
+    }
+    .proj-card .body li::before {
+      content: '·'; position: absolute; left: 0;
+      color: #6366f1; font-weight: bold; font-size: 18px;
+    }
+
+    /* ===== Evaluation ===== */
+    #eval {
+      position: relative;
+      background: linear-gradient(135deg, #0a0a23, #1a237e);
+      overflow: hidden;
+    }
+    #eval::before {
+      content: ''; position: absolute;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(99,102,241,0.06) 0%, transparent 70%);
+      top: -200px; right: -200px; border-radius: 50%;
+    }
+    #eval .section-head { color: #fff; }
+    #eval .section-sub { color: rgba(255,255,255,0.4); }
+    .eval-box {
+      max-width: 700px; margin: 0 auto;
+      text-align: center; position: relative; z-index: 2;
+    }
+    .eval-quote {
+      font-size: 18px; color: rgba(255,255,255,0.85);
+      line-height: 2; letter-spacing: 0.5px;
+      position: relative; padding: 0 20px;
+    }
+    .eval-quote::before {
+      content: '"'; position: absolute; top: -20px; left: -10px;
+      font-size: 60px; color: rgba(99,102,241,0.2);
+      font-family: Georgia, serif;
+    }
+    .eval-label {
+      margin-top: 24px;
+      font-size: 13px; color: rgba(255,255,255,0.3);
+      letter-spacing: 2px;
+    }
+
+    /* ===== Footer ===== */
+    footer {
+      padding: 32px 40px; text-align: center;
+      font-size: 13px; color: #aaa;
+      border-top: 1px solid #f0f0f5;
+    }
+
+    /* ===== Animations ===== */
+    .reveal {
+      opacity: 0; transform: translateY(40px);
+      transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 968px) {
+      .hero-content { grid-template-columns: 1fr; gap: 40px; }
+      .hero-left h1 { font-size: 40px; }
+      .hero-right { display: grid; grid-template-columns: 1fr 1fr; }
+      .stats-bar { grid-template-columns: repeat(2, 1fr); margin-top: -24px; gap: 12px; }
+      .stats-bar .stat-card { margin: 0; }
+      .skills-showcase { grid-template-columns: 1fr; }
+      .exp-card { grid-template-columns: 1fr; }
+      .proj-grid { grid-template-columns: 1fr; }
+      .about-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      nav { padding: 0 20px; }
+      .nav-links a { font-size: 12px; }
+      .hero-content { padding: 0 20px; }
+      .hero-left h1 { font-size: 30px; }
+      .hero-right { grid-template-columns: 1fr; }
+      .section { padding: 60px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== Nav ===== -->
+<nav id="navbar">
+  <div class="nav-logo">Z<span>.</span>Zelin</div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#exp">Experience</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#eval">Quote</a></li>
+  </ul>
+</nav>
+
+<!-- ===== Hero ===== -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-left">
+      <div class="hero-badge">✦ DATA × AUTOMATION</div>
+      <h1>曾泽霖<br><span class="highlight">数据驱动 · 自动赋能</span></h1>
+      <div class="sub">数据分析师 / RPA 自动化工程师</div>
+      <div class="desc">
+        从数据洞察到流程自动化，用技术打通业务效率的最后一公里。
+        持影刀RPA高级认证，4年数据与自动化实战经验。
+      </div>
+      <div class="hero-actions">
+        <a href="#projects" class="btn-primary">查看项目 →</a>
+        <a href="mailto:571883720@qq.com" class="btn-outline">📧 联系我</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-stat">
+        <div class="num">数据分析师 + RPA工程师</div>
+        <div class="lbl">双领域复合能力</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">影刀RPA · 高级认证</div>
+        <div class="lbl">自动化流程开发专业认证</div>
+      </div>
+      <div class="hero-stat">
+        <div class="num">4W+ 达人数据库</div>
+        <div class="lbl">15+ 维度指标 · 高价值数据资产</div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint">SCROLL ⌄</div>
+</section>
+
+<!-- ===== Stats ===== -->
+<div class="stats-bar">
+  <div class="stat-card reveal"><div class="num">4+</div><div class="lbl">年工作经验</div></div>
+  <div class="stat-card reveal reveal-delay-1"><div class="num">6+</div><div class="lbl">技术栈掌握</div></div>
+  <div class="stat-card reveal reveal-delay-2"><div class="num">4</div><div class="lbl">重点项目</div></div>
+  <div class="stat-card reveal reveal-delay-3"><div class="num">1</div><div class="lbl">专业认证 · 影刀RPA</div></div>
+</div>
+
+<!-- ===== About ===== -->
+<section id="about" class="section">
+  <div class="section-inner">
+    <div class="section-tag">✦ About</div>
+    <h2 class="section-head reveal">基本信息</h2>
+    <p class="section-sub reveal">毕业于宜宾学院财务管理专业，具备数据分析与RPA自动化双领域能力，致力于用数据洞察驱动业务决策，以自动化技术提升运营效率。</p>
+    <div class="about-grid reveal">
+      <div class="about-card"><div class="icon">👤</div><div><div class="lbl">姓名</div><div class="val">曾泽霖</div></div></div>
+      <div class="about-card"><div class="icon">🎂</div><div><div class="lbl">年龄 / 性别</div><div class="val">27岁 · 男</div></div></div>
+      <div class="about-card"><div class="icon">🎓</div><div><div class="lbl">教育背景</div><div class="val">宜宾学院 · 财务管理 · 本科</div></div></div>
+      <div class="about-card"><div class="icon">📞</div><div><div class="lbl">联系方式</div><div class="val">19272850701</div></div></div>
+      <div class="about-card"><div class="icon">📧</div><div><div class="lbl">电子邮箱</div><div class="val">571883720@qq.com</div></div></div>
+      <div class="about-card"><div class="icon">💼</div><div><div class="lbl">求职意向</div><div class="val">数据分析师 / RPA自动化工程师 · 全职</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Skills ===== -->
+<section id="skills" class="section">
+  <div class="section-inner">
+    <div class="section-tag" style="color:#818cf8;">✦ Skills</div>
+    <h2 class="section-head reveal">专业能力</h2>
+    <p class="section-sub reveal">三大核心能力矩阵，覆盖从数据到自动化的完整链路</p>
+    <div class="skills-showcase">
+      <div class="skill-card reveal">
+        <div class="icon" style="background:rgba(99,102,241,0.1);color:#818cf8;">📊</div>
+        <h3>数据分析</h3>
+        <p>精通 Excel 高级函数与透视表、MySQL 数据库查询优化、Python 数据分析（NumPy/Pandas）、Tableau 可视化仪表板搭建</p>
+      </div>
+      <div class="skill-card reveal reveal-delay-1">
+        <div class="icon" style="background:rgba(99,102,241,0.1);color:#818cf8;">🤖</div>
+        <h3>RPA 自动化</h3>
+        <p>持影刀RPA高级认证，覆盖 Excel 自动化、网页数据抓取、ERP 系统集成、流程编排与异常处理等全栈自动化能力</p>
+        <span class="cert">✦ 影刀RPA 高级认证</span>
+      </div>
+      <div class="skill-card reveal reveal-delay-2">
+        <div class="icon" style="background:rgba(99,102,241,0.1);color:#818cf8;">🕷</div>
+        <h3>数据采集</h3>
+        <p>熟练使用影刀RPA编写爬虫程序，掌握 RESTful API 数据对接、动态网页数据抓取、多源数据自动化同步</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Experience ===== -->
+<section id="exp" class="section">
+  <div class="section-inner">
+    <div class="section-tag">✦ Experience</div>
+    <h2 class="section-head reveal">工作经历</h2>
+    <p class="section-sub reveal">从数据分析到RPA自动化，持续的技能进阶与跨界融合</p>
+    <div class="exp-grid">
+      <div class="exp-card reveal">
+        <div class="exp-side">
+          <div class="company">九州通好药师</div>
+          <div class="period">2026.2 — 至今</div>
+          <div class="role">RPA 自动化工程师</div>
+        </div>
+        <div class="exp-body">
+          <div class="highlight blue">核心转型 · 自动化赋能</div>
+          <ul>
+            <li>基于影刀RPA设计业务流程自动化方案，覆盖数据采集、报表生成、系统操作</li>
+            <li>开发RPA机器人对接ERP系统，实现采购/库存/财务模块数据自动化录入与同步</li>
+            <li>实现电商价格监控、竞品采集、毛利核价等自动化流程，显著提升运营效率</li>
+            <li>持续优化现有流程，建立异常监控机制，保障机器人稳定运行</li>
+          </ul>
+        </div>
+      </div>
+      <div class="exp-card reveal reveal-delay-1">
+        <div class="exp-side">
+          <div class="company">仓藤传媒</div>
+          <div class="period">2022.7 — 2026.2</div>
+          <div class="role">数据分析师</div>
+        </div>
+        <div class="exp-body">
+          <div class="highlight blue">数据筑基 · 体系搭建</div>
+          <ul>
+            <li>开发标准化复盘报表模板，实现半小时内高质量交付，提升汇报效率60%</li>
+            <li>构建爬虫程序抓取核心数据，搭建自动化日报流程替代人工操作</li>
+            <li>设计部署云平台达人数据库，覆盖4W+达人、15+维度指标</li>
+            <li>参与目标制定与活动复盘，通过数据驱动提升营收与品牌知名度</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Projects ===== -->
+<section id="projects" class="section">
+  <div class="section-inner">
+    <div class="section-tag">✦ Projects</div>
+    <h2 class="section-head reveal">项目经验</h2>
+    <p class="section-sub reveal">4个代表性项目，横跨数据分析与RPA自动化两大领域</p>
+    <div class="proj-grid">
+      <div class="proj-card reveal">
+        <div class="top">
+          <h3>业务运营报表体系搭建</h3>
+          <div class="tags"><span>数据分析</span><span>Python</span><span>Tableau</span></div>
+        </div>
+        <div class="body">
+          <li>从KPI、用户、商品、流量等多维度构建完整指标体系</li>
+          <li>搭建GMV/流量/转化率日报体系，实时监测业务表现</li>
+          <li>利用Python+Excel+Tableau实现日报自动更新</li>
+        </div>
+      </div>
+      <div class="proj-card reveal reveal-delay-1">
+        <div class="top">
+          <h3>达人数据库"0-1"搭建</h3>
+          <div class="tags"><span>数据分析</span><span>数据建模</span></div>
+        </div>
+        <div class="body">
+          <li>清洗内外部达人数据，构建价值评估模型</li>
+          <li>基于加权算法匹配优质达人清单</li>
+          <li>覆盖4W+达人、15+维度指标，缩短交付周期</li>
+        </div>
+      </div>
+      <div class="proj-card reveal reveal-delay-2">
+        <div class="top">
+          <h3>Boss直聘招聘流程自动化</h3>
+          <div class="tags"><span>RPA自动化</span><span>影刀RPA</span></div>
+        </div>
+        <div class="body">
+          <li>自动识别消息、话术回复、保存简历至本地</li>
+          <li>批量定向筛选候选人并自动触达</li>
+          <li>按条件智能筛选简历并分层管理</li>
+          <li>搭建数据看板追踪触达量与转化率</li>
+        </div>
+      </div>
+      <div class="proj-card reveal reveal-delay-3">
+        <div class="top">
+          <h3>全平台毛利核价查询系统</h3>
+          <div class="tags"><span>RPA自动化</span><span>ERP集成</span></div>
+        </div>
+        <div class="body">
+          <li>自动从ERP下载成本数据并结构化存储</li>
+          <li>抓取前端售价，计算单计量单位比价</li>
+          <li>核价异常时自动群通知运营调整</li>
+          <li>定时调度 + 自动生成毛利报表</li>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Evaluation ===== -->
+<section id="eval" class="section">
+  <div class="section-inner">
+    <div class="eval-box">
+      <div class="section-tag" style="color:#818cf8;">✦ Philosophy</div>
+      <h2 class="section-head reveal" style="color:#fff;">工作信条</h2>
+      <div class="eval-quote reveal">
+        具备数据分析与RPA自动化双领域能力，善于从业务出发，将分析洞察转化为可落地的自动化方案，实现降本增效。时刻保持学习热情，积极拥抱技术变化，致力于通过数据与自动化驱动业务增长。
+      </div>
+      <div class="eval-label reveal">—— 曾泽霖 · 数据分析师 / RPA自动化工程师</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Footer ===== -->
+<footer>
+  © 2026 曾泽霖 · 数据 × 自动化 · All Rights Reserved
+</footer>
+
+<!-- ===== JS ===== -->
+<script>
+  // Nav scroll
+  const nav = document.getElementById('navbar');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 60));
+
+  // Scroll reveal
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal, .exp-card, .proj-card, .stat-card').forEach(el => obs.observe(el));
+
+  // Smooth scroll
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelector(a.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+</script>
+</body>
+</html>
